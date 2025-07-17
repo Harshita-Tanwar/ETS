@@ -12,8 +12,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-d*#8-=^lt1n3&kw01s0657g0z1
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 # --- Allowed Hosts ---
-ALLOWED_HOSTS = ['ets-production-c3dc.up.railway.app']
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+#ALLOWED_HOSTS = ['ets-production-c3dc.up.railway.app']
+#ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['ets-production-85f3.up.railway.app', 'localhost', '127.0.0.1']
+
+
 
 
 # --- Custom User Model ---
