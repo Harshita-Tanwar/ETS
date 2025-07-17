@@ -14,7 +14,7 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 # --- Allowed Hosts ---
 #ALLOWED_HOSTS = ['ets-production-c3dc.up.railway.app']
 #ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-ALLOWED_HOSTS = ['ets-production-85f3.up.railway.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['https://ets-production-357f.up.railway.app', 'localhost', '127.0.0.1']
 
 
 
