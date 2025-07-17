@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reports | Team Expense Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- ✅ Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md p-4 px-6 flex justify-between items-center text-black">
+    <div class="flex items-center gap-2">
+      <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M9 17v-2a4 4 0 014-4h5a4 4 0 014 4v2"></path>
+        <path d="M3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z"></path>
+      </svg>
+      <span class="text-xl font-bold tracking-wide">Team Expense Tracker</span>
+    </div>
+    <div class="flex items-center space-x-6">
+      <span class="font-medium">👤 {{ request.user.first_name }}</span>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="bg-white text-indigo-700 font-semibold px-4 py-2 rounded-lg hover:bg-indigo-100 transition">
+          Logout
+        </button>
+      </form>
+    </div>
+  </nav>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 min-h-screen bg-gray-900 text-white shadow-lg p-6 hidden md:block">
+      <div class="mb-10">
+        <h2 class="text-2xl font-bold mb-1">Welcome</h2>
+        <p class="text-sm text-gray-400">{{ request.user.first_name }}</p>
+      </div>
+      <nav class="space-y-4 text-sm">
+        <a href="{% url 'dashboard' %}" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition">
+          <span>📊</span> Dashboard
+        </a>
+        <a href="{% url 'add_expense' %}" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition">
+          <span>➕</span> Add Expense
+        </a>
+        <a href="{% url 'reports' %}" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">
+          <span>📈</span> Reports
+        </a>
+        <a href="{% url 'my_submissions' %}" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition">
+          <span>📁</span> My Submissions
+        </a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 text-red-300 hover:text-white transition">
+            <span>🚪</span> Logout
+          </button>
+        </form>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <h2 class="text-3xl font-bold text-indigo-700 mb-12">Expense Reports</h2>
+
+      <form method="post" class="mb-8">
+        {% csrf_token %}
+        <label class="block text-sm font-medium text-gray-700 mb-2">Select Report Range</label>
+        <select name="range" id="rangeSelect" class="w-full px-4 py-2 border rounded-md bg-white mb-4">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="half_yearly">Half-Yearly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">Download Format</label>
+        <select name="format" class="w-full px-4 py-2 border rounded-md bg-white mb-4">
+          <option value="html">View On Page</option>
+          <option value="pdf">Download PDF</option>
+          <option value="excel">Download Excel</option>
+        </select>
+
+        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded hover:bg-indigo-700 transition">
+          Generate Report
+        </button>
+      </form>
+
+      <div class="mt-8">
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Expenses by Category</h3>
+        <div class="chart-wrapper reports-chart flex justify-center">
+          <div class="w-[80%] max-w-md">
+            <canvas id="categoryChart" width="300" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+
+  <!-- ✅ Chart Rendering Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const range = document.getElementById("rangeSelect").value;
+
+      fetch(`/api/reports-chart-data/?range=${range}`)
+        .then(res => res.json())
+        .then(data => {
+          const ctx = document.getElementById("categoryChart").getContext("2d");
+          new Chart(ctx, {
+            type: "pie",
+            data: {
+              labels: data.category_labels,
+              datasets: [{
+                label: "Expenses",
+                data: data.category_totals,
+                backgroundColor: [
+                  "#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#6366F1",
+                  "#EC4899", "#3B82F6", "#8B5CF6", "#14B8A6", "#F97316"
+                ]
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: "bottom",
+                  labels: {
+                    color: "#1f2937"
+                  }
+                },
+                title: {
+                  display: true,
+                  text: "Expenses by Category",
+                  color: "#1f2937",
+                  font: { size: 16 }
+                }
+              }
+            }
+          });
+        })
+        .catch(err => console.error("Chart load error:", err));
+    });
+  </script>
+
+</body>
+</html>
