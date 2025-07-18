@@ -112,7 +112,7 @@ CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = False  # avoid redirect loop on Railway
 
 # ✅ CSRF Trusted Origins ---
-#CSRF_TRUSTED_ORIGINS = ['https://ets-production-c3dc.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://ets-production-c3dc.up.railway.app']
 CSRF_TRUSTED_ORIGINS = ['ets-production-357f.up.railway.app']
 
 
